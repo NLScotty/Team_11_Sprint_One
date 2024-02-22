@@ -19,7 +19,7 @@ function tokenList() {
    });
 };
 
-function newToken(username) {
+function newToken(username,email,phone) {
   if(DEBUG) console.log('token.newToken()');
   let newToken = JSON.parse(`{
       "created": "1969-01-31 12:30:00",
@@ -38,6 +38,9 @@ function newToken(username) {
   newToken.username = username;
   newToken.token = crc32(username).toString(16);
   newToken.expires = `${format(expires, 'yyyy-MM-dd HH:mm:ss')}`;
+
+  if(email !== undefined) newToken.email = email;
+  if(email !== undefined) newToken.phone = phone;
 
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
       if(error) throw error; 
@@ -78,26 +81,62 @@ function queryByUsername(username){
 //TO DO
 /*
 Find user by email from json/tokens.json, and return the corresponding record
-May not be unique, so return a list of tokens
+
 */
 function queryByEmail(){
 
 }
 //TO DO
 /*
-Find user by phone from json/tokens.json, and return the corresponding record. 
+Find user by email from json/tokens.json, and return the corresponding record. 
 May not be unique, so return a list of tokens
 */
 function queryByPhone(){
 
 }
 
-function updateEmail(){
-
+function updateEmail(username, newEmail){
+  fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+    if(error) throw error; 
+    let tokens = JSON.parse(data);
+    let token = tokens.filter(token => token.username === username)[0];
+    if(token == undefined){
+      console.log(`User ${username} cannot be found. Check your spelling and try again!`);
+    }
+    else{
+      let oldemail= token.email;
+      token.email = newEmail;
+      console.log(token);
+      fs.writeFile(__dirname + '/json/tokens.json', JSON.stringify(tokens), (err) => {
+        if (err) console.log(err);
+        else { 
+            console.log(`Email from ${username} updated from ${oldemail} to ${token.email}`);
+        }
+      })
+    }
+  });
 }
 
-function updatePhone(){
-
+function updatePhone(username,newPhone){
+  fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+    if(error) throw error; 
+    let tokens = JSON.parse(data);
+    let token = tokens.filter(token => token.username === username)[0];
+    if(token == undefined){
+      console.log(`User ${username} cannot be found. Check your spelling and try again!`);
+    }
+    else{
+      let oldphone = token.phone;
+      token.phone = newPhone;
+      console.log(token);
+      fs.writeFile(__dirname + '/json/tokens.json', JSON.stringify(tokens), (err) => {
+        if (err) console.log(err);
+        else { 
+            console.log(`Phone number from ${username} updated from ${oldphone} to ${token.phone}`);
+        }
+      })
+    }
+  });
 }
 
 function tokenApp() {
@@ -117,7 +156,19 @@ function tokenApp() {
           console.log('invalid syntax. node myapp token --new [username]')
       } else {
         if(DEBUG) console.log('--new');
-        newToken(myArgs[2]);
+        newToken(myArgs[2], myArgs[3], myArgs[4]);
+      }
+      break;
+  case '--update':
+      if(myArgs.length < 5){
+          console.log('invalid syntax. node myapp token --update [e/p] [username] [email/phone]')
+      }else{
+        if(myArgs[2] == 'e'){
+          updateEmail(myArgs[3], myArgs[4]);
+        }
+        if(myArgs[2] == 'p'){
+          updatePhone(myArgs[3], myArgs[4]);
+        }
       }
       break;
   case '--help':

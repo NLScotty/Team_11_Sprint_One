@@ -130,4 +130,4 @@ dist
 .pnp.*
 
 # We don't want to upload tokens to github!
-json/
+.json/
