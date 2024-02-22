@@ -61,6 +61,44 @@ function addDays(date, days) {
   result.setDate(result.getDate() + days);
   return result;
 }
+//TO DO
+/*
+Token count should be able to count the tokens in json/tokens.json, and return a number
+*/
+function tokenCount(){
+
+}
+//TO DO
+/*
+Find user by username from json/tokens.json, and return the corresponding record
+*/
+function queryByUsername(username){
+
+}
+//TO DO
+/*
+Find user by email from json/tokens.json, and return the corresponding record
+May not be unique, so return a list of tokens
+*/
+function queryByEmail(){
+
+}
+//TO DO
+/*
+Find user by phone from json/tokens.json, and return the corresponding record. 
+May not be unique, so return a list of tokens
+*/
+function queryByPhone(){
+
+}
+
+function updateEmail(){
+
+}
+
+function updatePhone(){
+
+}
 
 function tokenApp() {
   if(DEBUG) console.log('tokenApp()');
