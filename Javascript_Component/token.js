@@ -4,6 +4,7 @@ const path = require('path');
 
 const crc32 = require('crc/crc32');
 const { format } = require('date-fns');
+const { debug } = require('console');
 
 const myArgs = process.argv.slice(2);
 
@@ -66,22 +67,39 @@ function addDays(date, days) {
 Token count should be able to count the tokens in json/tokens.json, and return a number
 */
 function tokenCount(){
-
+  if(DEBUG) console.log('tokenCount()');
+  fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+      if(error) throw error; 
+      let tokens = JSON.parse(data);
+      console.log('Total number of tokens:', tokens.length);
+   });
 }
 //TO DO
 /*
 Find user by username from json/tokens.json, and return the corresponding record
 */
 function queryByUsername(username){
-
+if(DEBUG) console.log('queryByUsername()',username);
+fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+  if(error) throw error; 
+  let tokens = JSON.parse(data);
+  let token = tokens.find(obj => obj.username === username);
+  console.log(token);
+});
 }
 //TO DO
 /*
 Find user by email from json/tokens.json, and return the corresponding record
 May not be unique, so return a list of tokens
 */
-function queryByEmail(){
-
+function queryByEmail(email){
+if(DEBUG) console.log('queryByEmail()', email);
+fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+  if(error) throw error; 
+  let tokens = JSON.parse(data);
+  let token = tokens.find(obj => obj.email === email);
+  console.log(token);
+});
 }
 //TO DO
 /*
@@ -89,7 +107,13 @@ Find user by phone from json/tokens.json, and return the corresponding record.
 May not be unique, so return a list of tokens
 */
 function queryByPhone(){
-
+  if(DEBUG) console.log('queryByPhone()', phone);
+  fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+      if(error) throw error; 
+      let tokens = JSON.parse(data);
+      let userTokens = tokens.filter(obj => obj.phone === phone);
+      console.log(token);
+   });
 }
 
 function updateEmail(){
@@ -103,7 +127,15 @@ function updatePhone(){
 function tokenApp() {
   if(DEBUG) console.log('tokenApp()');
 
-  switch (myArgs[1]) {
+  switch (myArgs[1]){
+    case '--query':
+      if (myArgs.length < 3) {
+     //   console.log('invalid syntax. node myapp token --new [username]')
+    } else {
+      if(DEBUG) console.log('--query');
+      queryByEmail(myArgs[2]);
+    }
+    break;
   case '--count':
     if(DEBUG) console.log('--count');
  //     tokenCount();
