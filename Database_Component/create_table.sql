@@ -34,7 +34,7 @@ CREATE TABLE book (
     isbn VARCHAR(13) NOT NULL,
     title VARCHAR(255) NOT NULL,
     year INT,
-    author_ID INT REFERENCES author(author_ID),
+    author_ID INT REFERENCES author(author_ID) NOT NULL,
     genre_ID INT REFERENCES genre(genre_ID)
 );
 
