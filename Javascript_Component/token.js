@@ -87,7 +87,12 @@ fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
   if(error) throw error; 
   let tokens = JSON.parse(data);
   let token = tokens.find(obj => obj.username === username);
-  console.log(token);
+  if(token == undefined){
+    console.log('No user found');
+  }
+  else{
+    console.log(token);
+  }
 });
 }
 //TO DO
@@ -100,8 +105,13 @@ if(DEBUG) console.log('queryByEmail()', email);
 fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
   if(error) throw error; 
   let tokens = JSON.parse(data);
-  let token = tokens.find(obj => obj.email === email);
-  console.log(token);
+  let tokenList = tokens.filter(obj => obj.email === email);
+  if(tokenList.length == 0){
+    console.log('No user/users found');
+  }
+  else{
+    console.log(tokenList);
+  }
 });
 }
 //TO DO
@@ -109,13 +119,18 @@ fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
 Find user by email from json/tokens.json, and return the corresponding record. 
 May not be unique, so return a list of tokens
 */
-function queryByPhone(){
+function queryByPhone(phone){
   if(DEBUG) console.log('queryByPhone()', phone);
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
       if(error) throw error; 
       let tokens = JSON.parse(data);
       let userTokens = tokens.filter(obj => obj.phone === phone);
-      console.log(token);
+      if(tokenList.length == 0){
+        console.log('No user/users found');
+      }
+      else{
+        console.log(userTokens);
+      }
    });
 }
 
@@ -123,7 +138,7 @@ function updateEmail(username, newEmail){
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
     if(error) throw error; 
     let tokens = JSON.parse(data);
-    let token = tokens.filter(token => token.username === username)[0];
+    let token = tokens.find(token => token.username === username);
     if(token == undefined){
       console.log(`User ${username} cannot be found. Check your spelling and try again!`);
     }
@@ -145,7 +160,7 @@ function updatePhone(username,newPhone){
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
     if(error) throw error; 
     let tokens = JSON.parse(data);
-    let token = tokens.filter(token => token.username === username)[0];
+    let token = tokens.find(token => token.username === username);
     if(token == undefined){
       console.log(`User ${username} cannot be found. Check your spelling and try again!`);
     }
@@ -168,16 +183,28 @@ function tokenApp() {
 
   switch (myArgs[1]){
     case '--query':
-      if (myArgs.length < 3) {
-     //   console.log('invalid syntax. node myapp token --new [username]')
-    } else {
       if(DEBUG) console.log('--query');
-      queryByEmail(myArgs[2]);
-    }
+      if (myArgs.length < 4) {
+        console.log('invalid syntax. node myapp token --query [u/e/p] [username/email/phone]')
+      } 
+      else {
+          if(myArgs[2] == 'u' || myArgs[2] == 'U'){
+            queryByUsername(myArgs[3]);
+          }
+          else if(myArgs[2] == 'e' || myArgs[2] == 'E'){
+            queryByEmail(myArgs[3]);
+          }
+          else if(myArgs[2] == 'p' || myArgs[2] == 'P'){
+            queryByPhone(myArgs[3]);
+          }
+          else{
+            console.log('invalid syntax. node myapp token --query [u/e/p] [username/email/phone]')
+          }
+      }
     break;
   case '--count':
     if(DEBUG) console.log('--count');
- //     tokenCount();
+      tokenCount();
       break;
   case '--list':
     if(DEBUG) console.log('--list');
@@ -195,11 +222,14 @@ function tokenApp() {
       if(myArgs.length < 5){
           console.log('invalid syntax. node myapp token --update [e/p] [username] [email/phone]')
       }else{
-        if(myArgs[2] == 'e'){
+        if(myArgs[2] == 'e' || myArgs[2] == 'E' ){
           updateEmail(myArgs[3], myArgs[4]);
         }
-        if(myArgs[2] == 'p'){
+        else if(myArgs[2] == 'p' || myArgs[2] == 'P'){
           updatePhone(myArgs[3], myArgs[4]);
+        }
+        else{
+          console.log('invalid syntax. node myapp token --update [e/p] [username] [email/phone]')
         }
       }
       break;
