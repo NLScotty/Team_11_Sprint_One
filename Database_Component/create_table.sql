@@ -25,7 +25,7 @@ CREATE TABLE staff (
     name VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
-    location_ID INT REFERENCES book_mobile_locations(location_id)
+    location_ID INT REFERENCES book_mobile_locations(location_id) NOT NULL
 );
 
 -- Create the author table
@@ -34,7 +34,7 @@ CREATE TABLE book (
     isbn VARCHAR(13) NOT NULL,
     title VARCHAR(255) NOT NULL,
     year INT,
-    author_ID INT REFERENCES author(author_ID),
+    author_ID INT REFERENCES author(author_ID) NOT NULL,
     genre_ID INT REFERENCES genre(genre_ID)
 );
 
