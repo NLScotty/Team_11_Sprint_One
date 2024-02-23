@@ -25,7 +25,7 @@ CREATE TABLE staff (
     name VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20) NOT NULL,
-    location_ID INT REFERENCES book_mobile_locations(location_id)
+    location_ID INT REFERENCES book_mobile_locations(location_id) NOT NULL
 );
 
 -- Create the author table
