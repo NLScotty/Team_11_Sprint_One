@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Membership Form</title>
+</head>
+<body>
+    <h1>New Membership Form</h1>
+    <form id="membershipForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="tokenDisplay" style="display: none;">
+        <h2>Membership Confirmed!</h2>
+        <p>Your token:</p>
+        <p id="token"></p>
+    </div>
+
+    <script>
+        document.getElementById('membershipForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const response = await fetch('/generateToken', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `username=${username}`
+            });
+            const data = await response.json();
+            document.getElementById('token').innerText = data.token;
+            document.getElementById('tokenDisplay').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
