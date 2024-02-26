@@ -18,3 +18,8 @@ myapp token           manage the user tokens
 myapp token --list    list all the tokens
 myapp token --count   provide a count of all the tokens
 myapp token --new     add a new token
+myapp token --query   query user tokens
+myapp token --update  update user token
+
+myapp server          manages the web server
+myapp server --run    runs the webserver on port 5000
