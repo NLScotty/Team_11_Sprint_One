@@ -18,7 +18,9 @@
         <p>Your token:</p>
         <p id="token"></p>
     </div>
+    <div id="tokenList"></div>
 
+    <script src="script.js"></script>
     <script>
         document.getElementById('membershipForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -35,5 +37,6 @@
             document.getElementById('tokenDisplay').style.display = 'block';
         });
     </script>
+    </div>
 </body>
 </html>
