@@ -1,6 +1,6 @@
 const express = require('express');
 const server = express();
-const { newToken } = require('./token.js');
+const { newToken, tokenList } = require('./token.js');
 
 server.use(express.urlencoded({extended:true}));
 
@@ -27,6 +27,23 @@ server.post('/',(req,res) => {
 
     res.setHeader('Content-Type','text/html'); 
     res.end('<h1>'+token+'</h1>');
+})
+
+server.post('/',(req,res) => {
+    const name=req.body.name;
+    const email=req.body.email;
+    const phone=req.body.phone;
+    const token=newToken(name,email,phone)
+
+    res.setHeader('Content-Type','text/html'); 
+    res.end('<h1>'+token+'</h1>');
+})
+
+server.get('/tokens',async (req,res) => {
+    let userTokens = await tokenList();
+
+    res.setHeader('Content-Type','text/html'); 
+    res.end('<h1>'+userTokens+'</h1>');
 })
 
 function serverApp(){

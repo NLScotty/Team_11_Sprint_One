@@ -8,16 +8,18 @@ const { debug } = require('console');
 
 const myArgs = process.argv.slice(2);
 
-function tokenList() {
+async function tokenList() {
   if(DEBUG) console.log('token.tokenCount()');
-  fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+  let userTokens = await fs.promises.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
       if(error) throw error; 
       let tokens = JSON.parse(data);
       console.log('** User List **')
       tokens.forEach(obj => {
           console.log(' * ' + obj.username + ': ' + obj.token);
       });
+      return tokens;
    });
+   return userTokens;
 };
 
 function newToken(username,email,phone) {
@@ -246,4 +248,5 @@ function tokenApp() {
 module.exports = {
   tokenApp,
   newToken,
+  tokenList,
 }
