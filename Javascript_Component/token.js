@@ -8,6 +8,10 @@ const { debug } = require('console');
 
 const myArgs = process.argv.slice(2);
 
+const express = require('express');
+const app = express();
+
+
 function tokenList() {
   if(DEBUG) console.log('token.tokenCount()');
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
@@ -177,6 +181,19 @@ function updatePhone(username,newPhone){
     }
   });
 }
+
+app.get('/getTokensByEmail', (req, res) => {
+  fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+      if (error) {
+          console.error('Error reading tokens:', error);
+          res.status(500).json({ error: 'Internal server error' });
+          return;
+      }
+      let tokens = JSON.parse(data);
+      const tokenList = tokens.filter(obj => obj.email !== undefined);
+      res.json(tokenList);
+  });
+});
 
 function tokenApp() {
   if(DEBUG) console.log('tokenApp()');
