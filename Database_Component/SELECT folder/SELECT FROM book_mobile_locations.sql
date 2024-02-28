@@ -1,0 +1,1 @@
+SELECT * FROM book_mobile_locations
