@@ -9,7 +9,7 @@ const { debug } = require('console');
 const myArgs = process.argv.slice(2);
 
 async function tokenList() {
-  if(DEBUG) console.log('token.tokenCount()');
+  if(DEBUG) console.log('token.tokenList()');
   let userTokens = await fs.promises.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
       if(error) throw error; 
       let tokens = JSON.parse(data);

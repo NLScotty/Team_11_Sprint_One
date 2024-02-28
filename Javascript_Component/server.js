@@ -39,11 +39,18 @@ server.post('/',(req,res) => {
     res.end('<h1>'+token+'</h1>');
 })
 
-server.get('/tokens',async (req,res) => {
-    let userTokens = await tokenList();
-
-    res.setHeader('Content-Type','text/html'); 
-    res.end('<h1>'+userTokens+'</h1>');
+server.get('/userList',async (req,res) => {
+    let data = await tokenList();
+    let userList = JSON.parse(data);
+    res.setHeader('Content-Type','text/html');
+    let responseString = '<h1> User Token Page</h1>';
+    responseString+='<table>'
+    responseString+='<tr> <th>User Token</th> <th>Username</th> <th>Email</th> <th> </th> <th> Phone </th> </tr>'
+    userList.forEach(user => {
+        responseString += `<tr> <td>${user.token}</td> <td>${user.username}</td> <td>${user.email}</td> <td>${user.phone}</td> </tr>`;
+    });
+    responseString+='</table>'
+    res.end(responseString);
 })
 
 function serverApp(){
