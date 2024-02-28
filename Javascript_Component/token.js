@@ -8,16 +8,23 @@ const { debug } = require('console');
 
 const myArgs = process.argv.slice(2);
 
-async function tokenList() {
+function tokenList() {
   if(DEBUG) console.log('token.tokenList()');
-  let userTokens = await fs.promises.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+  fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
       if(error) throw error; 
       let tokens = JSON.parse(data);
       console.log('** User List **')
       tokens.forEach(obj => {
           console.log(' * ' + obj.username + ': ' + obj.token);
       });
-      return tokens;
+   });
+};
+
+// Used to fetch tokens in an asynchronous environment
+async function fetchTokenList() {
+  if(DEBUG) console.log('token.fetchTokenList()');
+  let userTokens = await fs.promises.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+      if(error) throw error; 
    });
    return userTokens;
 };
@@ -97,6 +104,7 @@ fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
   }
 });
 }
+
 //TO DO
 /*
 Find user by email from json/tokens.json, and return the corresponding record
@@ -248,5 +256,6 @@ function tokenApp() {
 module.exports = {
   tokenApp,
   newToken,
-  tokenList,
+  fetchTokenList,
+  updateEmail,
 }
