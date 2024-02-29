@@ -1,7 +1,21 @@
 const fs = require('fs');
 const path = require('path');
 const fsPromises = require('fs').promises;
-const { folders, configjson, tokenjson } = require('./templates');
+const { folders, configjson, tokenjson } = require('./models/templates');
+
+const EventEmitter = require('events');
+const myEmitter = new EventEmitter();
+
+myEmitter.on('cli', (command) => {
+    const d = new Date();
+    if(DEBUG) console.log(`Command line interface event: '${command}' at ${d}`);
+    if(!fs.existsSync(path.join(__dirname, 'logs'))) {
+      fs.mkdirSync(path.join(__dirname, 'logs'));
+    }
+    fs.appendFile(path.join(__dirname, 'logs', d.getDay()+'-'+d.getMonth()+'-'+d.getFullYear()+'-cli.log'), `Route Event on: ${command} at ${d}\n`, (error) => {
+      if(error) throw error;
+    });
+});
 
 function createFolders() {
   if(DEBUG) console.log('init.createFolders()');
@@ -69,15 +83,18 @@ function initializeApp() {
     switch (myArgs[1]) {
     case '--all':
         if(DEBUG) console.log('--all createFolders() & createFiles()');
+        myEmitter.emit('cli', 'init --all');
         createFolders();
         createFiles();
         break;
     case '--cat':
         if(DEBUG) console.log('--cat createFiles()');
+        myEmitter.emit('cli', 'init --cat');
         createFiles();
         break;
     case '--mk':
         if(DEBUG) console.log('--mk createFolders()');
+        myEmitter.emit('cli', 'init --mk');
         createFolders();
         break;
     case '--help':

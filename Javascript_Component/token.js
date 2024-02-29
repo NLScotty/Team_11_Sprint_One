@@ -8,12 +8,23 @@ const { debug } = require('console');
 
 const myArgs = process.argv.slice(2);
 
-const express = require('express');
-const app = express();
 
+const EventEmitter = require('events');
+const myEmitter = new EventEmitter();
+
+myEmitter.on('cli', (command) => {
+    const d = new Date();
+    if(DEBUG) console.log(`Command line interface event: '${command}' at ${d}`);
+    if(!fs.existsSync(path.join(__dirname, 'logs'))) {
+      fs.mkdirSync(path.join(__dirname, 'logs'));
+    }
+    fs.appendFile(path.join(__dirname, 'logs', d.getDay()+'-'+d.getMonth()+'-'+d.getFullYear()+'-cli.log'), `Route Event on: ${command} at ${d}\n`, (error) => {
+      if(error) throw error;
+    });
+});
 
 function tokenList() {
-  if(DEBUG) console.log('token.tokenCount()');
+  if(DEBUG) console.log('token.tokenList()');
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
       if(error) throw error; 
       let tokens = JSON.parse(data);
@@ -22,6 +33,15 @@ function tokenList() {
           console.log(' * ' + obj.username + ': ' + obj.token);
       });
    });
+};
+
+// Used to fetch tokens in an asynchronous environment
+async function fetchTokenList() {
+  if(DEBUG) console.log('token.fetchTokenList()');
+  let userTokens = await fs.promises.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+      if(error) throw error; 
+   });
+   return userTokens;
 };
 
 function newToken(username,email,phone) {
@@ -99,6 +119,7 @@ fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
   }
 });
 }
+
 //TO DO
 /*
 Find user by email from json/tokens.json, and return the corresponding record
@@ -182,18 +203,20 @@ function updatePhone(username,newPhone){
   });
 }
 
-app.get('/getTokensByEmail', (req, res) => {
+function removeExpired(){
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
-      if (error) {
-          console.error('Error reading tokens:', error);
-          res.status(500).json({ error: 'Internal server error' });
-          return;
-      }
-      let tokens = JSON.parse(data);
-      const tokenList = tokens.filter(obj => obj.email !== undefined);
-      res.json(tokenList);
-  });
+    if(error) throw error; 
+    let tokens = JSON.parse(data);
+    let filteredTokens = tokens.filter(obj => new Date(obj.expires) > new Date());
+    console.log(filteredTokens);
+    fs.writeFile(__dirname + '/json/tokens.json', JSON.stringify(filteredTokens), (err) => {
+        if (err) console.log(err);
+        else { 
+            console.log(`Expired Tokens removed!.`);
+        }
+    })
 });
+}
 
 function tokenApp() {
   if(DEBUG) console.log('tokenApp()');
@@ -206,12 +229,15 @@ function tokenApp() {
       } 
       else {
           if(myArgs[2] == 'u' || myArgs[2] == 'U'){
+            myEmitter.emit('cli', 'token --query username');
             queryByUsername(myArgs[3]);
           }
           else if(myArgs[2] == 'e' || myArgs[2] == 'E'){
+            myEmitter.emit('cli', 'token --query email');
             queryByEmail(myArgs[3]);
           }
           else if(myArgs[2] == 'p' || myArgs[2] == 'P'){
+            myEmitter.emit('cli', 'token --query phone');
             queryByPhone(myArgs[3]);
           }
           else{
@@ -221,10 +247,12 @@ function tokenApp() {
     break;
   case '--count':
     if(DEBUG) console.log('--count');
+    myEmitter.emit('cli', 'token --count');
       tokenCount();
       break;
   case '--list':
     if(DEBUG) console.log('--list');
+    myEmitter.emit('cli', 'token --list');
       tokenList();
       break; 
   case '--new':
@@ -232,6 +260,7 @@ function tokenApp() {
           console.log('invalid syntax. node myapp token --new [username]')
       } else {
         if(DEBUG) console.log('--new');
+        myEmitter.emit('cli', 'token --new');
         newToken(myArgs[2], myArgs[3], myArgs[4]);
       }
       break;
@@ -240,15 +269,22 @@ function tokenApp() {
           console.log('invalid syntax. node myapp token --update [e/p] [username] [email/phone]')
       }else{
         if(myArgs[2] == 'e' || myArgs[2] == 'E' ){
+          myEmitter.emit('cli', 'token --update email');
           updateEmail(myArgs[3], myArgs[4]);
         }
         else if(myArgs[2] == 'p' || myArgs[2] == 'P'){
+          myEmitter.emit('cli', 'token --update phone');
           updatePhone(myArgs[3], myArgs[4]);
         }
         else{
           console.log('invalid syntax. node myapp token --update [e/p] [username] [email/phone]')
         }
       }
+      break;
+  case '--expire':
+      if(DEBUG) console.log('--expire');
+      myEmitter.emit('cli', 'token --expire');
+      removeExpired();
       break;
   case '--help':
   case '--h':
@@ -263,4 +299,6 @@ function tokenApp() {
 module.exports = {
   tokenApp,
   newToken,
+  fetchTokenList,
+  updateEmail,
 }
