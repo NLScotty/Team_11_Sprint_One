@@ -12,6 +12,7 @@ const myArgs = process.argv.slice(2);
 const EventEmitter = require('events');
 const myEmitter = new EventEmitter();
 
+// Used to generate logs from use on the command line
 myEmitter.on('cli', (command) => {
     const d = new Date();
     if(DEBUG) console.log(`Command line interface event: '${command}' at ${d}`);
@@ -23,6 +24,7 @@ myEmitter.on('cli', (command) => {
     });
 });
 
+// Retreives a list of tokens from json/tokens.json
 function tokenList() {
   if(DEBUG) console.log('token.tokenList()');
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
@@ -44,6 +46,7 @@ async function fetchTokenList() {
    return userTokens;
 };
 
+// Used to add at token to json/tokens.json. It can take up to 3 parameters
 function newToken(username,email,phone) {
   if(DEBUG) console.log('token.newToken()');
   let newToken = JSON.parse(`{
@@ -89,10 +92,7 @@ function addDays(date, days) {
   result.setDate(result.getDate() + days);
   return result;
 }
-//TO DO
-/*
-Token count should be able to count the tokens in json/tokens.json, and return a number
-*/
+// Returns the number of tokens in tokens file
 function tokenCount(){
   if(DEBUG) console.log('tokenCount()');
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
@@ -101,10 +101,7 @@ function tokenCount(){
       console.log('Total number of tokens:', tokens.length);
    });
 }
-//TO DO
-/*
-Find user by username from json/tokens.json, and return the corresponding record
-*/
+// Returns a token by username
 function queryByUsername(username){
 if(DEBUG) console.log('queryByUsername()',username);
 fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
@@ -120,11 +117,7 @@ fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
 });
 }
 
-//TO DO
-/*
-Find user by email from json/tokens.json, and return the corresponding record
-
-*/
+// Returns a list of tokens by email
 function queryByEmail(email){
 if(DEBUG) console.log('queryByEmail()', email);
 fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
@@ -139,11 +132,7 @@ fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
   }
 });
 }
-//TO DO
-/*
-Find user by email from json/tokens.json, and return the corresponding record. 
-May not be unique, so return a list of tokens
-*/
+// Returns a list of tokens by phone
 function queryByPhone(phone){
   if(DEBUG) console.log('queryByPhone()', phone);
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
@@ -158,7 +147,7 @@ function queryByPhone(phone){
       }
    });
 }
-
+// Updates a user's email
 function updateEmail(username, newEmail){
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
     if(error) throw error; 
@@ -180,7 +169,7 @@ function updateEmail(username, newEmail){
     }
   });
 }
-
+// Updates a user's phone number
 function updatePhone(username,newPhone){
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
     if(error) throw error; 
@@ -202,7 +191,7 @@ function updatePhone(username,newPhone){
     }
   });
 }
-
+// Removes all expired tokens from database
 function removeExpired(){
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
     if(error) throw error; 
@@ -217,7 +206,7 @@ function removeExpired(){
     })
 });
 }
-
+// Used by myapp.js to run the token commands on the commandline
 function tokenApp() {
   if(DEBUG) console.log('tokenApp()');
 
@@ -295,7 +284,7 @@ function tokenApp() {
       });
   }
 }
-
+// We export token app for myapp.js. The other ones are exported for server.
 module.exports = {
   tokenApp,
   newToken,
