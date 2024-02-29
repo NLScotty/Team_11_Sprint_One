@@ -1,12 +1,52 @@
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const server = express();
 const { newToken, fetchTokenList, updateEmail} = require('./token.js');
 
+const EventEmitter = require('events');
+const myEmitter = new EventEmitter();
+
 server.use(express.urlencoded({extended:true}));
+
+myEmitter.on('route', (url) => {
+    const d = new Date();
+    if(DEBUG) console.log(`Route Event at: '${url}' at ${d}`);
+    if(!fs.existsSync(path.join(__dirname, 'logs'))) {
+      fs.mkdirSync(path.join(__dirname, 'logs'));
+    }
+    fs.appendFile(path.join(__dirname, 'logs', d.getDay()+'-'+d.getMonth()+'-'+d.getFullYear()+'-webroute.log'), `Route Event on: ${url} at ${d}\n`, (error) => {
+      if(error) throw error;
+    });
+});
+
+myEmitter.on('cli', (command) => {
+    const d = new Date();
+    if(DEBUG) console.log(`Command line interface event: '${command}' at ${d}`);
+    if(!fs.existsSync(path.join(__dirname, 'logs'))) {
+      fs.mkdirSync(path.join(__dirname, 'logs'));
+    }
+    fs.appendFile(path.join(__dirname, 'logs', d.getDay()+'-'+d.getMonth()+'-'+d.getFullYear()+'-cli.log'), `Route Event on: ${command} at ${d}\n`, (error) => {
+      if(error) throw error;
+    });
+});
 
 const myArgs = process.argv.slice(2);
 
 server.get('/',(req,res) => {
+    myEmitter.emit('route', 'get /index');
+    res.setHeader('Content-Type','text/html');
+    res.end(
+        `<ul>
+            <li><a href="/addUser"> Add new user </a></li>
+            <li><a href="/findByName"> Find user by username </a></li>
+            <li><a href="/updateEmail"> Update user email </a></li>
+            <li><a href="/userList"> Show User List </a></li>
+        </ul>`);
+})
+
+server.get('/addUser',(req,res) => {
+    myEmitter.emit('route', 'get /addUser');
     res.setHeader('Content-Type','text/html');
     res.end(
         `<form method="POST">
@@ -20,7 +60,8 @@ server.get('/',(req,res) => {
         </form>`);
 })
 
-server.post('/',(req,res) => {
+server.post('/addUser',(req,res) => {
+    myEmitter.emit('route', 'post /addUser');
     const name=req.body.name;
     const email=req.body.email;
     const phone=req.body.phone;
@@ -31,6 +72,7 @@ server.post('/',(req,res) => {
 })
 
 server.get('/findByName',(req,res) => {
+    myEmitter.emit('route', 'get /findByName');
     res.setHeader('Content-Type','text/html');
     res.end(
         `<form method="POST">
@@ -41,6 +83,7 @@ server.get('/findByName',(req,res) => {
 })
 
 server.post('/findByName',async (req,res) => {
+    myEmitter.emit('route', 'post /findByName');
     let name = req.body.name;
     let data = await fetchTokenList();
     let userList = JSON.parse(data);
@@ -62,6 +105,7 @@ server.post('/findByName',async (req,res) => {
 })
 
 server.get('/updateEmail',(req,res) => {
+    myEmitter.emit('route', 'get /updateEmail');
     res.setHeader('Content-Type','text/html');
     res.end(
         `<form method="POST">
@@ -74,6 +118,7 @@ server.get('/updateEmail',(req,res) => {
 })
 
 server.post('/updateEmail',async (req,res) => {
+    myEmitter.emit('route', 'post /updateEmail');
     let name = req.body.name;
     let email = req.body.email;
     let data = await fetchTokenList();
@@ -93,6 +138,7 @@ server.post('/updateEmail',async (req,res) => {
 })
 
 server.get('/userList',async (req,res) => {
+    myEmitter.emit('route', 'get /userList');
     let data = await fetchTokenList();
     let userList = JSON.parse(data);
     res.setHeader('Content-Type','text/html');
@@ -115,6 +161,7 @@ function serverApp(){
         console.log('invalid syntax. node myapp server --run');
     } 
     else{
+        myEmitter.emit('cli', 'server --run');
         server.listen(5000)
     }
 }

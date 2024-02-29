@@ -1,5 +1,5 @@
 global.DEBUG = true;
-
+const path = require('path');
 const fs = require("fs");
 
 const { initializeApp } = require('./init.js');

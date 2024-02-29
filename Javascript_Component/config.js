@@ -1,7 +1,23 @@
 const fs = require('fs');
+const path = require('path');
 const myArgs = process.argv.slice(2);
 
 const { configjson } = require('./templates');
+
+const EventEmitter = require('events');
+const myEmitter = new EventEmitter();
+
+myEmitter.on('cli', (command) => {
+    const d = new Date();
+    if(DEBUG) console.log(`Command line interface event at: '${command}' at ${d}`);
+    if(!fs.existsSync(path.join(__dirname, 'logs'))) {
+      fs.mkdirSync(path.join(__dirname, 'logs'));
+    }
+    fs.appendFile(path.join(__dirname, 'logs', d.getDay()+'-'+d.getMonth()+'-'+d.getFullYear()+'-cli.log'), `Route Event on: ${command} at ${d}\n`, (error) => {
+      if(error) throw error;
+    });
+});
+
 
 function displayConfig() {
     if(DEBUG) console.log('config.displayConfig()');
@@ -57,14 +73,17 @@ function configApp() {
   switch (myArgs[1]) {
   case '--show':
       if(DEBUG) console.log('--show');
+      myEmitter.emit('cli', 'config --show');
       displayConfig();
       break;
   case '--reset':
       if(DEBUG) console.log('--reset');
+      myEmitter.emit('cli', 'config --reset');
       resetConfig();
       break;
   case '--set':
       if(DEBUG) console.log('--set');
+      myEmitter.emit('cli', 'config --set');
       setConfig();
       break;
   case '--help':

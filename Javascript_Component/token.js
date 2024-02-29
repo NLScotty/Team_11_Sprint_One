@@ -8,6 +8,20 @@ const { debug } = require('console');
 
 const myArgs = process.argv.slice(2);
 
+const EventEmitter = require('events');
+const myEmitter = new EventEmitter();
+
+myEmitter.on('cli', (command) => {
+    const d = new Date();
+    if(DEBUG) console.log(`Command line interface event: '${command}' at ${d}`);
+    if(!fs.existsSync(path.join(__dirname, 'logs'))) {
+      fs.mkdirSync(path.join(__dirname, 'logs'));
+    }
+    fs.appendFile(path.join(__dirname, 'logs', d.getDay()+'-'+d.getMonth()+'-'+d.getFullYear()+'-cli.log'), `Route Event on: ${command} at ${d}\n`, (error) => {
+      if(error) throw error;
+    });
+});
+
 function tokenList() {
   if(DEBUG) console.log('token.tokenList()');
   fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
@@ -199,12 +213,15 @@ function tokenApp() {
       } 
       else {
           if(myArgs[2] == 'u' || myArgs[2] == 'U'){
+            myEmitter.emit('cli', 'token --query username');
             queryByUsername(myArgs[3]);
           }
           else if(myArgs[2] == 'e' || myArgs[2] == 'E'){
+            myEmitter.emit('cli', 'token --query email');
             queryByEmail(myArgs[3]);
           }
           else if(myArgs[2] == 'p' || myArgs[2] == 'P'){
+            myEmitter.emit('cli', 'token --query phone');
             queryByPhone(myArgs[3]);
           }
           else{
@@ -214,10 +231,12 @@ function tokenApp() {
     break;
   case '--count':
     if(DEBUG) console.log('--count');
+    myEmitter.emit('cli', 'token --count');
       tokenCount();
       break;
   case '--list':
     if(DEBUG) console.log('--list');
+    myEmitter.emit('cli', 'token --list');
       tokenList();
       break; 
   case '--new':
@@ -225,6 +244,7 @@ function tokenApp() {
           console.log('invalid syntax. node myapp token --new [username]')
       } else {
         if(DEBUG) console.log('--new');
+        myEmitter.emit('cli', 'token --new');
         newToken(myArgs[2], myArgs[3], myArgs[4]);
       }
       break;
@@ -233,9 +253,11 @@ function tokenApp() {
           console.log('invalid syntax. node myapp token --update [e/p] [username] [email/phone]')
       }else{
         if(myArgs[2] == 'e' || myArgs[2] == 'E' ){
+          myEmitter.emit('cli', 'token --update email');
           updateEmail(myArgs[3], myArgs[4]);
         }
         else if(myArgs[2] == 'p' || myArgs[2] == 'P'){
+          myEmitter.emit('cli', 'token --update phone');
           updatePhone(myArgs[3], myArgs[4]);
         }
         else{
