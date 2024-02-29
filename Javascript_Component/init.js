@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const fsPromises = require('fs').promises;
-const { folders, configjson, tokenjson } = require('./templates');
+const { folders, configjson, tokenjson } = require('./models/templates');
 
 const EventEmitter = require('events');
 const myEmitter = new EventEmitter();

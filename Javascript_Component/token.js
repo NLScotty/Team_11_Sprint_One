@@ -202,6 +202,21 @@ function updatePhone(username,newPhone){
   });
 }
 
+function removeExpired(){
+  fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+    if(error) throw error; 
+    let tokens = JSON.parse(data);
+    let filteredTokens = tokens.filter(obj => new Date(obj.expires) > new Date());
+    console.log(filteredTokens);
+    fs.writeFile(__dirname + '/json/tokens.json', JSON.stringify(filteredTokens), (err) => {
+        if (err) console.log(err);
+        else { 
+            console.log(`Expired Tokens removed!.`);
+        }
+    })
+});
+}
+
 function tokenApp() {
   if(DEBUG) console.log('tokenApp()');
 
@@ -264,6 +279,11 @@ function tokenApp() {
           console.log('invalid syntax. node myapp token --update [e/p] [username] [email/phone]')
         }
       }
+      break;
+  case '--expire':
+      if(DEBUG) console.log('--expire');
+      myEmitter.emit('cli', 'token --expire');
+      removeExpired();
       break;
   case '--help':
   case '--h':

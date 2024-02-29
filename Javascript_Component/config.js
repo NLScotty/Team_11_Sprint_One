@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const myArgs = process.argv.slice(2);
 
-const { configjson } = require('./templates');
+const { configjson } = require('./models/templates');
 
 const EventEmitter = require('events');
 const myEmitter = new EventEmitter();

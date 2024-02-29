@@ -20,6 +20,7 @@ myapp token --count   provide a count of all the tokens
 myapp token --new     add a new token
 myapp token --query   query user tokens
 myapp token --update  update user token
+myapp token --expire  removes expired tokens
 
 myapp server          manages the web server
 myapp server --run    runs the webserver on port 5000
