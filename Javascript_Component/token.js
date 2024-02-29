@@ -10,19 +10,32 @@ const myArgs = process.argv.slice(2);
 
 const express = require('express');
 const app = express();
-
-
 function tokenList() {
   if(DEBUG) console.log('token.tokenCount()');
-  fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
-      if(error) throw error; 
-      let tokens = JSON.parse(data);
+  let tokens;
+  tokens = fs.readFile(__dirname + '/json/tokens.json', 'utf-8', (error, data) => {
+      if(error) throw error;
+      tokens = JSON.parse(data);
       console.log('** User List **')
       tokens.forEach(obj => {
           console.log(' * ' + obj.username + ': ' + obj.token);
       });
+     return tokens
    });
+   console.log("Dows this print?")
+   return tokens;
 };
+
+// Usage example:
+tokenList((error, tokens) => {
+  if (error) {
+    console.error('Error reading tokens:', error);
+    // Handle the error
+  } else {
+    // Use the tokens array
+    console.log(tokens);
+  }
+});
 
 function newToken(username,email,phone) {
   if(DEBUG) console.log('token.newToken()');
@@ -195,6 +208,39 @@ app.get('/getTokensByEmail', (req, res) => {
   });
 });
 
+app.get('/getTokensByEmail', (req, res) => {
+  // Call tokenList with a callback function
+  tokenList((error, tokens) => {
+    if (error) {
+      console.error('Error reading tokens:', error);
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+    // Filter tokens by email and send the response
+    const tokenList = tokens.filter(obj => obj.email !== undefined);
+    res.json(tokenList);
+  });
+});
+
+function tokenApp() {
+  if(DEBUG) console.log('tokenApp()');
+
+  switch (myArgs[1]){
+    // Other cases...
+    case '--list':
+      if(DEBUG) console.log('--list');
+      // Call tokenList with a callback function
+      tokenList((error, tokens) => {
+        if (error) {
+          console.error('Error reading tokens:', error);
+          return;
+        }
+        console.log(tokens); // Log the tokens to the console
+      });
+      break; 
+    // Other cases...
+  }
+}
 function tokenApp() {
   if(DEBUG) console.log('tokenApp()');
 
@@ -263,4 +309,5 @@ function tokenApp() {
 module.exports = {
   tokenApp,
   newToken,
+  tokenList,
 }
