@@ -8,7 +8,12 @@ const EventEmitter = require('events');
 const myEmitter = new EventEmitter();
 
 server.use(express.urlencoded({extended:true}));
+//
+// The server.js file mostly consists of routes that run the server. 
+// It also has a function that checks for command line arguments to run the server.
+//
 
+// logs used to keep track of what routes get used
 myEmitter.on('route', (url) => {
     const d = new Date();
     if(DEBUG) console.log(`Route Event at: '${url}' at ${d}`);
@@ -20,6 +25,7 @@ myEmitter.on('route', (url) => {
     });
 });
 
+// logs used to keep track of what cli commands get used
 myEmitter.on('cli', (command) => {
     const d = new Date();
     if(DEBUG) console.log(`Command line interface event: '${command}' at ${d}`);
@@ -31,8 +37,10 @@ myEmitter.on('cli', (command) => {
     });
 });
 
+//used for reading the command line
 const myArgs = process.argv.slice(2);
 
+// index page route
 server.get('/',(req,res) => {
     myEmitter.emit('route', 'get /index');
     res.setHeader('Content-Type','text/html');
@@ -45,6 +53,7 @@ server.get('/',(req,res) => {
         </ul>`);
 })
 
+// the get portion of the addUser endpoint. It returns a form
 server.get('/addUser',(req,res) => {
     myEmitter.emit('route', 'get /addUser');
     res.setHeader('Content-Type','text/html');
@@ -59,7 +68,7 @@ server.get('/addUser',(req,res) => {
             <button type ="submit"> Submit </button>
         </form>`);
 })
-
+// the post portion of the addUser endpoint. It displays a token
 server.post('/addUser',(req,res) => {
     myEmitter.emit('route', 'post /addUser');
     const name=req.body.name;
@@ -71,6 +80,7 @@ server.post('/addUser',(req,res) => {
     res.end('<h1>'+token+'</h1>');
 })
 
+// the get portion of the findByName endpoint. It displays a form
 server.get('/findByName',(req,res) => {
     myEmitter.emit('route', 'get /findByName');
     res.setHeader('Content-Type','text/html');
@@ -81,7 +91,7 @@ server.get('/findByName',(req,res) => {
             <button type ="submit"> Search </button>
         </form>`);
 })
-
+// the post portion of the findByName endpoint. It displays a user token or User not found
 server.post('/findByName',async (req,res) => {
     myEmitter.emit('route', 'post /findByName');
     let name = req.body.name;
@@ -103,7 +113,7 @@ server.post('/findByName',async (req,res) => {
         res.end('<h1>User not Found!</h1>');
     }
 })
-
+// the get portion of the updateEmail endpoint. It displays a form
 server.get('/updateEmail',(req,res) => {
     myEmitter.emit('route', 'get /updateEmail');
     res.setHeader('Content-Type','text/html');
@@ -116,7 +126,7 @@ server.get('/updateEmail',(req,res) => {
             <button type ="submit"> Update </button>
         </form>`);
 })
-
+// the post portion of the addUser endpoint. It displays either a success message or a failure message
 server.post('/updateEmail',async (req,res) => {
     myEmitter.emit('route', 'post /updateEmail');
     let name = req.body.name;
@@ -136,7 +146,7 @@ server.post('/updateEmail',async (req,res) => {
         res.end('<h1>User not Found! No Changes Made!</h1>');
     }
 })
-
+// the get portion of the userlist endpoint. It displays a list of users/tokens
 server.get('/userList',async (req,res) => {
     myEmitter.emit('route', 'get /userList');
     let data = await fetchTokenList();
@@ -152,8 +162,7 @@ server.get('/userList',async (req,res) => {
     res.end(responseString);
 })
 
-
-
+// The commandline bit used by myapp.js (driver file). It checks to see if --run is entered. If so, runs the server
 function serverApp(){
     if(DEBUG) console.log('serverApp()');
     console.log(myArgs[1]);

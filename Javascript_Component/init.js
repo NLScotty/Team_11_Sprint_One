@@ -6,6 +6,7 @@ const { folders, configjson, tokenjson } = require('./models/templates');
 const EventEmitter = require('events');
 const myEmitter = new EventEmitter();
 
+// Used to generate logs from use on the command line
 myEmitter.on('cli', (command) => {
     const d = new Date();
     if(DEBUG) console.log(`Command line interface event: '${command}' at ${d}`);
